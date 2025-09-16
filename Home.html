@@ -1,8 +1,222 @@
-<html>
-    <head>
-        <title>Quiz</title>
-    </head>
-    <body>
-        <a>teste</a>
-    </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Fofo - Cloud, Docker & AWS</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #ffe4f0, #ffd6eb, #fff0f7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .quiz-container {
+      background: #fffafa;
+      padding: 30px;
+      border-radius: 25px;
+      box-shadow: 0 8px 25px rgba(216, 27, 96, 0.2);
+      width: 650px;
+      max-height: 90vh;
+      overflow-y: auto;
+      text-align: center;
+      border: 3px solid #f8bbd0;
+    }
+    h1 {
+      color: #d81b60;
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-shadow: 1px 1px #ffc1e3;
+    }
+    .question {
+      margin: 15px 0;
+      text-align: left;
+      background: #fff0f7;
+      padding: 12px;
+      border-radius: 15px;
+      border: 1px dashed #f8bbd0;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      text-align: left;
+    }
+    label {
+      background: #ffe4f0;
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+      display: block;
+      border: 1px solid #f8bbd0;
+    }
+    label:hover {
+      background: #f48fb1;
+      color: white;
+      transform: scale(1.03);
+    }
+    input {
+      margin-right: 8px;
+      accent-color: #ec407a;
+    }
+    .btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      background: #ec407a;
+      color: white;
+      transition: 0.3s;
+      margin-top: 15px;
+      box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+    }
+    .btn:hover {
+      background: #d81b60;
+      transform: scale(1.05);
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #880e4f;
+    }
+    .correct {
+      color: #4caf50;
+      font-weight: bold;
+    }
+    .wrong {
+      color: #e91e63;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container" id="quizBox">
+    <h1>🌸 Quiz Para Estudos - Cloud, Docker & AWS 🌸</h1>
+    <button class="btn" onclick="startQuiz()">💖 Iniciar Quiz 💖</button>
+  </div>
+
+  <script>
+    const questions = [
+      // Cloud
+      { question: "Qual das opções é uma característica fundamental da computação em nuvem segundo o NIST?",
+        answers: ["Elasticidade rápida", "Servidor físico dedicado", "Backup manual", "Instalação local obrigatória"],
+        correct: 0 },
+      { question: "Migrar para a nuvem transforma CAPEX em qual tipo de despesa?",
+        answers: ["Impostos", "Investimento fixo", "OPEX - despesas operacionais", "Folha de pagamento"],
+        correct: 2 },
+      { question: "No modelo IaaS, o usuário tem controle sobre:",
+        answers: ["Hardware físico", "Sistema operacional e aplicativos implantados", "Atualizações de software do provedor", "Toda a rede global da nuvem"],
+        correct: 1 },
+      { question: "Um exemplo de SaaS é:",
+        answers: ["AWS EC2", "Azure App Services", "Google Workspace", "Docker Engine"],
+        correct: 2 },
+      { question: "Um exemplo de PaaS (Platform as a Service) é:",
+        answers: ["Heroku", "Google Workspace", "Amazon EC2", "Docker CLI"],
+        correct: 0 },
+      { question: "No modelo de responsabilidade compartilhada em nuvem, o provedor cuida de:",
+        answers: ["Segurança física e da infraestrutura", "Configuração dos aplicativos do cliente", "Definir permissões de usuários", "Senhas de acesso"],
+        correct: 0 },
+      // Docker
+      { question: "O que são containers no Docker?",
+        answers: ["Máquinas físicas isoladas", "Máquinas virtuais completas", "Processos isolados no nível do SO", "Backups automáticos"],
+        correct: 2 },
+      { question: "Quem iniciou o projeto Docker dentro da empresa DotCloud?",
+        answers: ["Linus Torvalds", "Solomon Hykes", "Jeff Bezos", "Mark Zuckerberg"],
+        correct: 1 },
+      { question: "Qual comando lista todas as imagens disponíveis no Docker?",
+        answers: ["docker ps", "docker run", "docker images", "docker info"],
+        correct: 2 },
+      { question: "Qual arquivo define instruções para construir uma imagem Docker?",
+        answers: ["Dockerfile", "docker-compose.yml", "Makefile", "Setup.py"],
+        correct: 0 },
+      { question: "No Docker, volumes são usados para:",
+        answers: ["Aumentar a memória RAM", "Preservar dados mesmo após remover containers", "Criar novas redes virtuais", "Acelerar o download de imagens"],
+        correct: 1 },
+      { question: "Qual é a principal diferença entre Docker e máquinas virtuais (VMs)?",
+        answers: ["Docker isola no nível de processo/SO, VMs emulam hardware completo", "Docker é mais lento que VMs", "VMs usam menos recursos que Docker", "Docker substitui todos os sistemas operacionais"],
+        correct: 0 },
+      // AWS EC2
+      { question: "Amazon EC2 fornece:",
+        answers: ["Aplicativos prontos para uso", "Capacidade computacional escalável sob demanda", "Somente banco de dados gerenciado", "Rede de entrega de conteúdo"],
+        correct: 1 },
+      { question: "Qual opção de instância EC2 é mais barata que On-Demand ao pagar adiantado?",
+        answers: ["Free Tier", "Reserved Instances", "Spot Instances", "Standard Billing"],
+        correct: 1 },
+      { question: "Spot Instances permitem:",
+        answers: ["Instalar sistemas operacionais customizados", "Lances para capacidade não utilizada da AWS", "Usar containers locais", "Migrar VMs automaticamente"],
+        correct: 1 },
+      { question: "Qual serviço monitora métricas como CPU, rede e disco em EC2?",
+        answers: ["Elastic Load Balancing", "CloudFormation", "Amazon CloudWatch", "AWS Inspector"],
+        correct: 2 },
+      { question: "O que é Bootstrapping em EC2?",
+        answers: ["Backup de volumes EBS", "Configuração automática ao iniciar servidores", "Migração entre regiões", "Encerramento automático de instâncias"],
+        correct: 1 },
+      { question: "Elastic Load Balancer serve para:",
+        answers: ["Balancear tráfego entre instâncias EC2", "Gerar relatórios financeiros", "Aumentar espaço de armazenamento", "Gerenciar credenciais da AWS"],
+        correct: 0 }
+    ];
+
+    function startQuiz() {
+      const quizBox = document.getElementById("quizBox");
+      quizBox.innerHTML = "<h1>🌸 Quiz Para Estudos - Cloud, Docker & AWS 🌸</h1>";
+
+      const form = document.createElement("form");
+      form.id = "quizForm";
+
+      questions.forEach((q, idx) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `<p><strong>${idx+1}. ${q.question}</strong></p>`;
+
+        const optionsDiv = document.createElement("div");
+        optionsDiv.classList.add("options");
+
+        q.answers.forEach((answer, i) => {
+          const label = document.createElement("label");
+          label.innerHTML = `<input type="radio" name="q${idx}" value="${i}"> ${answer}`;
+          optionsDiv.appendChild(label);
+        });
+
+        div.appendChild(optionsDiv);
+        form.appendChild(div);
+      });
+
+      const finishBtn = document.createElement("button");
+      finishBtn.type = "button";
+      finishBtn.classList.add("btn");
+      finishBtn.textContent = "✨ Finalizar ✨";
+      finishBtn.onclick = checkAnswers;
+
+      form.appendChild(finishBtn);
+      quizBox.appendChild(form);
+    }
+
+    function checkAnswers() {
+      const form = document.getElementById("quizForm");
+      let score = 0;
+      let resultHTML = "<h2>💎 Resultado 💎</h2>";
+
+      questions.forEach((q, idx) => {
+        const selected = form[`q${idx}`].value;
+        if (selected == q.correct) {
+          score++;
+          resultHTML += `<p>${idx+1}. ${q.question} - <span class="correct">Correto! 🌟</span></p>`;
+        } else {
+          resultHTML += `<p>${idx+1}. ${q.question} - <span class="wrong">Errado 💔</span> (Resposta certa: ${q.answers[q.correct]})</p>`;
+        }
+      });
+
+      resultHTML += `<div class="result">Você acertou <strong>${score}</strong> de <strong>${questions.length}</strong> perguntas 🎀</div>`;
+      resultHTML += `<button class="btn" onclick="startQuiz()">🔄 Refazer Quiz</button>`;
+      document.getElementById("quizBox").innerHTML = resultHTML;
+    }
+  </script>
+</body>
 </html>
